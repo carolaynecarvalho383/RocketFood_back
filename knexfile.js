@@ -1,15 +1,22 @@
+const { default: knex } = require("knex");
+
 const path = require('path');
+const { callbackify } = require("util");
 
-const knex = require('knex')({
-  client: 'mysql',
-  version: '5.7',
-  connection: {
-    host : '127.0.0.1',
-    port : 3306,
-    user : 'root',
-    password : '123456',
-    database : 'users'
-  }
-});
-
-module.exports =knex
+module.exports = {
+  development: {
+    client: 'sqlite3',
+    connection: {
+      filename: path.resolve(__dirname,"src", "database", "database.db")
+    },
+    pool:{
+      afterCreate:(conn, cb) =>{
+        conn.run("PRAGMA foreign_keys = ON", cb)
+      }
+    },
+    migrations: {
+      directory: path.resolve(__dirname, "src","database", "knex", "migrations")
+    },
+    useNullAsDefault: true
+  },
+};

@@ -1,15 +1,17 @@
 require("express-async-errors");
 
-const User = require("./database/mySql/Users")
-
+//const migrationsRun = require("./database/knex/")
+const migrationsRun = require("./database/sqlite/")
 const AppError = require("./utils/AppError")
 
 const express = require("express");
 
 const routes = require("./routes");
 
+migrationsRun()
 
 const app = express();
+
 app.use(express.json());
 
 app.use(routes)
