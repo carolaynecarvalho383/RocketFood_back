@@ -5,22 +5,22 @@ const sqliteConnection = require("../database/sqlite")
 class CategoryController {
 
   async create(req, res) {
-    const { name } = req.body
+    const { category_name } = req.body
 
     const database = await sqliteConnection()
-    const nameExists = await database.get("SELECT * FROM users WHERE name = (?)", [name])
+    const category_nameExists = await database.get("SELECT * FROM category WHERE category_name = (?)", [category_name])
 
-    if(nameExists) {
+    if(category_nameExists) {
       throw new AppError("categoria já cadastrada")
     }
     await knex("category").insert({
-      name
+      category_name
     })
     res.json()
   }
 
   async update(req, res) {
-    const { name } = req.body;
+    const { category_name } = req.body;
     const { id } = req.params;
 
     const database = await sqliteConnection()
@@ -31,19 +31,19 @@ class CategoryController {
       throw new AppError("Usuário não encontrado")
     }
 
-    const checkCategoryName = await database.get("SELECT * FROM category WHERE name = (?)", [name])
+    const checkCategorycategory_name = await database.get("SELECT * FROM category WHERE category_name = (?)", [category_name])
 
-    if (checkCategoryName && checkCategoryName.id === category.id) {
+    if (checkCategorycategory_name && checkCategorycategory_name.id === category.id) {
       throw new AppError("Esta categoria Já está em uso")
     }
 
-    category.name = name ?? category.name
+    category.category_name = category_name ?? category.category_name
 
     await database.run(`
       UPDATE category SET
-      name = ?
+      category_name = ?
       WHERE id = ?
-    `, [category.name, category.id])
+    `, [category.category_name, category.id])
 
 
 
@@ -63,6 +63,19 @@ class CategoryController {
 
     res.json()
 
+  }
+
+  async show(req, res) {
+    const { id } = req.params
+
+    const category = await knex("category").where({ id }).first()
+    const product = await knex("products").where({id_category: id})
+    console.log(product);
+    return res.json({
+      ...category,
+      product
+      
+    });
   }
 
 }

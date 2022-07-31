@@ -5,29 +5,99 @@ const sqliteConnection = require("../database/sqlite")
 class ProductsController {
 
   async create(req, res) {
-    const { name } = req.body
+    const { title, price, description, ingredients, inventory } = req.body
 
     const database = await sqliteConnection()
-    const { category_id } = req.params;
 
-    const nameExists = await database.get("SELECT * FROM products WHERE name = (?)", [name])
-     await database.get("SELECT * FROM products Join category  ON category.id = products.category_id")
-   
+    const { id_category } = req.params;
 
-    if(nameExists) {
+    const titleExists = await database.get("SELECT * FROM products WHERE title = (?)", [title])
+    //await database.get("SELECT * FROM products Join category  ON category.id = products.id_category")
+    //const titleExists = await knex("products").select("*").where({ title: [title] })
+
+    if (titleExists) {
       throw new AppError("produto já cadastrado")
     }
 
-    
-    if (!name || name === "" || name === null) {
-      throw new AppError("Não e possível cadastrar um produto sem nome")
+      if (!title || title.length === 0 || title === undefined) {
+        throw new AppError("Não e possível cadastrar um produto sem nome")
+      }
+
+    const product_id = await knex("products").insert({
+      title,
+      price,
+      description,
+      inventory,
+      id_category
+    })
+
+    const ingredientsInsert = ingredients.map(name => {
+      return {
+        product_id,
+        name
+      }
+    })
+
+    await knex("ingredients").insert(ingredientsInsert)
+
+
+
+    res.json()
+  }
+
+  async show(req, res) {
+    const { id } = req.params
+
+    const product = await knex("products").where({ id }).first()
+    const ingredient = await knex("ingredients").where({ product_id: id }).orderBy("name")
+
+    return res.json({
+      ...product,
+      ingredient
+
+    });
+  }
+
+  async update(req, res) {
+    const { title, price, description, inventory } = req.body
+    const { id } = req.params;
+
+    const database = await sqliteConnection()
+
+    const product = await knex("products").select("*").where({ id: id })
+
+
+    if (!product || product.length === 0) {
+      throw new AppError("Produto não encontrado")
     }
 
-    await knex("products").insert({
-      name,
-      category_id
-    })
+    product.title = title ?? product.title
+    product.price = price ?? product.price
+    product.description = description ?? product.description
+    product.inventory = inventory ?? product.insert
+
+    await knex("products")
+      .where({ id: id })
+      .update({
+        title: product.title,
+        price: product.price,
+        description: product.description,
+        inventory: product.inventory,
+        updated_at: new Date()
+      })
+
     res.json()
+  }
+
+  async delete(req, res) {
+    const { id } = req.params
+    await knex("products")
+      .where({ id })
+      .delete()
+
+
+    res.json()
+
   }
 
 
