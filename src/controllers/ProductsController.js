@@ -42,7 +42,7 @@ class ProductsController {
 
 
 
-    res.json()
+    return res.json()
   }
 
   async show(req, res) {
@@ -86,7 +86,7 @@ class ProductsController {
         updated_at: new Date()
       })
 
-    res.json()
+   return res.json()
   }
 
   async delete(req, res) {
@@ -96,9 +96,10 @@ class ProductsController {
       .delete()
 
 
-    res.json()
+    return res.json()
 
   }
+
   async index(req, res) {
     const { title, ingredients,product_id } = req.query
 

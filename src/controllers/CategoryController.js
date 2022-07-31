@@ -10,13 +10,13 @@ class CategoryController {
     const database = await sqliteConnection()
     const category_nameExists = await database.get("SELECT * FROM category WHERE category_name = (?)", [category_name])
 
-    if(category_nameExists) {
+    if (category_nameExists) {
       throw new AppError("categoria já cadastrada")
     }
     await knex("category").insert({
       category_name
     })
-    res.json()
+    return res.json()
   }
 
   async update(req, res) {
@@ -47,7 +47,7 @@ class CategoryController {
 
 
 
-    res.json()
+    return res.json()
   }
 
   async delete(req, res) {
@@ -61,7 +61,7 @@ class CategoryController {
   `, [id])
 
 
-    res.json()
+   return res.json()
 
   }
 
@@ -69,14 +69,14 @@ class CategoryController {
     const { id } = req.params
 
     const category = await knex("category").where({ id }).first()
-    const product = await knex("products").where({id_category: id})
+    const product = await knex("products").where({ id_category: id })
 
     //const ingredient = await knex("ingredients").where({product_id: id})
     //console.log(ingredient);
     return res.json({
       ...category,
       product
-      
+
     });
   }
 
