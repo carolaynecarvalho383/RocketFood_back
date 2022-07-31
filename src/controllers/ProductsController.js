@@ -19,9 +19,9 @@ class ProductsController {
       throw new AppError("produto já cadastrado")
     }
 
-      if (!title || title.length === 0 || title === undefined) {
-        throw new AppError("Não e possível cadastrar um produto sem nome")
-      }
+    if (!title || title.length === 0 || title === undefined) {
+      throw new AppError("Não e possível cadastrar um produto sem nome")
+    }
 
     const product_id = await knex("products").insert({
       title,
@@ -99,7 +99,51 @@ class ProductsController {
     res.json()
 
   }
+  async index(req, res) {
+    const { title, ingredients,product_id } = req.query
 
+    let product
+
+    if (ingredients) {
+      const filterIngredients = ingredients.split(',')
+        .map(ingredient => ingredient.trim());
+
+      product = await knex("ingredients")
+        .select([
+          "products.id",
+          "products.title",
+          "products.price",
+        ])
+        .whereLike("products.title", `%${title}%`)
+        .whereIn("name", filterIngredients)
+        .innerJoin("products", "products.id", "ingredients.product_id")
+        .orderBy("products.title")
+
+    } else {
+      product = await knex("products")
+        .whereLike("title", `%${title}%`)
+        .orderBy("title")
+    }
+
+    const productIngredients = await knex("ingredients")
+      .where({ product_id })
+    
+
+    const productWithIngredient = product.map(product => {
+      const ingredientsProduct = productIngredients.filter(ingredient => ingredient.product_id === product.id)
+     
+      return {
+        ...product,
+        ingredients: ingredientsProduct
+      }
+
+    })
+
+
+
+    return res.json(productWithIngredient)
+
+  }
 
 }
 module.exports = ProductsController;

@@ -70,7 +70,9 @@ class CategoryController {
 
     const category = await knex("category").where({ id }).first()
     const product = await knex("products").where({id_category: id})
-    console.log(product);
+
+    //const ingredient = await knex("ingredients").where({product_id: id})
+    //console.log(ingredient);
     return res.json({
       ...category,
       product
