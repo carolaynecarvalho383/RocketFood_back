@@ -5,15 +5,11 @@ const sqliteConnection = require("../database/sqlite")
 class ProductsController {
 
   async create(req, res) {
-    const { title, price, description, ingredients, inventory } = req.body
+    const { title, price, description, ingredients, inventory, category } = req.body
 
     const database = await sqliteConnection()
 
-    const { id_category } = req.params;
-
     const titleExists = await database.get("SELECT * FROM products WHERE title = (?)", [title])
-    //await database.get("SELECT * FROM products Join category  ON category.id = products.id_category")
-    //const titleExists = await knex("products").select("*").where({ title: [title] })
 
     if (titleExists) {
       throw new AppError("produto já cadastrado")
@@ -28,7 +24,7 @@ class ProductsController {
       price,
       description,
       inventory,
-      id_category
+      category
     })
 
     const ingredientsInsert = ingredients.map(name => {
@@ -62,7 +58,7 @@ class ProductsController {
     const { title, price, description, inventory } = req.body
     const { id } = req.params;
 
-    const database = await sqliteConnection()
+    //const database = await sqliteConnection()
 
     const product = await knex("products").select("*").where({ id: id })
 

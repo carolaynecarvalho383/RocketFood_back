@@ -8,7 +8,7 @@ class UsersController {
 
   async create(req, res) {
     
-    const { name, email, password } = req.body
+    const { name, email, password, admin} = req.body
 
     const database = await sqliteConnection()
     const userExists = await database.get("SELECT * FROM users WHERE email = (?)", [email])
@@ -20,15 +20,15 @@ class UsersController {
 
     const hashedPAssword = await hash(password, 8)
 
-    await database.run("INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
-      [name, email, hashedPAssword])
+    await database.run("INSERT INTO users (name, email, password , admin) VALUES (?, ?, ? ,?)",
+      [name, email, hashedPAssword,admin])
 
 
     if (!name || name === "" || name === null) {
       throw new AppError("Nome é obrigatório")
     }
 
-   return res.status(200).json({ name, email, password })
+   return res.status(200).json({ name, email, password ,admin})
   }
 
   async update(req, res) {
