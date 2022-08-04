@@ -1,8 +1,9 @@
 require("express-async-errors");
 
-//const migrationsRun = require("./database/knex/")
 const migrationsRun = require("./database/sqlite/")
 const AppError = require("./utils/AppError")
+const uploadConfig = require("./config/upload")
+
 
 const express = require("express");
 
@@ -13,6 +14,8 @@ migrationsRun()
 const app = express();
 
 app.use(express.json());
+
+app.use("/files", express.static(uploadConfig.UPLOAD_FOLDER))
 
 app.use(routes)
 
