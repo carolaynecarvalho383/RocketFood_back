@@ -1,6 +1,10 @@
 const AppError = require('../utils/AppError');
 const knex = require("../database/knex")
 const sqliteConnection = require("../database/sqlite")
+const DiskStorage = require('../providers/DiskStorage');
+
+const diskStorage = new DiskStorage()
+
 
 class ProductsController {
 
@@ -8,6 +12,8 @@ class ProductsController {
     const { title, price, description, ingredients, inventory, category } = req.body
 
     const database = await sqliteConnection()
+
+    const productFilename = req.file.filename;
 
     const titleExists = await database.get("SELECT * FROM products WHERE title = (?)", [title])
 
@@ -19,12 +25,15 @@ class ProductsController {
       throw new AppError("Não e possível cadastrar um produto sem nome")
     }
 
+    const filename = await diskStorage.saveFile(productFilename)
+
     const product_id = await knex("products").insert({
       title,
       price,
       description,
       inventory,
-      category
+      category,
+      image:filename
     })
 
     const ingredientsInsert = ingredients.map(name => {
@@ -35,8 +44,6 @@ class ProductsController {
     })
 
     await knex("ingredients").insert(ingredientsInsert)
-
-
 
     return res.json()
   }
@@ -58,19 +65,30 @@ class ProductsController {
     const { title, price, description, inventory } = req.body
     const { id } = req.params;
 
-    //const database = await sqliteConnection()
+    const productFilename = req.file.filename;
 
-    const product = await knex("products").select("*").where({ id: id })
+    const product = await knex("products")
+    .select("*")
+    .where({ id: id })
+    .first()
 
 
     if (!product || product.length === 0) {
       throw new AppError("Produto não encontrado")
     }
 
+    if (product.image) {
+      await diskStorage.deleteFile(product.image)
+    }
+
+    const filename = await diskStorage.saveFile(productFilename)
+
+
     product.title = title ?? product.title
     product.price = price ?? product.price
     product.description = description ?? product.description
-    product.inventory = inventory ?? product.insert
+    product.inventory = inventory ?? product.inventory
+    product.image = filename  ?? product.image
 
     await knex("products")
       .where({ id: id })
@@ -79,6 +97,7 @@ class ProductsController {
         price: product.price,
         description: product.description,
         inventory: product.inventory,
+        image: product.image,
         updated_at: new Date()
       })
 
@@ -142,5 +161,6 @@ class ProductsController {
 
   }
 
+  
 }
 module.exports = ProductsController;

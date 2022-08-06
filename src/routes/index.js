@@ -6,6 +6,7 @@ const sessionsRoutes = require("./sessions.routes");
 const purchasesRouter = require("./purchases.routes");
 
 
+
 const routes = Router();
 
 routes.use("/users", usersRoutes);
@@ -13,6 +14,8 @@ routes.use("/products", productsRouter);
 routes.use("/ingredients", ingredientRouter);
 routes.use("/sessions", sessionsRoutes); 
 routes.use("/purchases", purchasesRouter); 
+
+
 
 
 

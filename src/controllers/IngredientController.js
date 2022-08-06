@@ -1,9 +1,13 @@
 const knex = require("../database/knex");
+const DiskStorage = require('../providers/DiskStorage');
+
+const diskStorage = new DiskStorage()
 
 class IngredientController {
 
   async index(req, res) {
-    const { product_id } = req.params
+    const { product_id } = req.query
+
 
     const ingredients = await knex("ingredients")
       .where({ product_id })
@@ -11,16 +15,25 @@ class IngredientController {
     return res.json(ingredients)
   }
 
-  async update(req, res) {
-    const { name,image} = req.body
-    const { id } = req.params
+  async create(req, res) {
+    const { name } = req.body
+    const product_id  = req.params
+    console.log(product_id);
+    const ingredientsFilename = req.file.filename;
+    
 
-    await knex("ingredients").
-    where({ id })
-    .update({
-      name:name,
-      image:image
-    })
+     const ingredientFilename = await diskStorage.saveFile(ingredientsFilename)
+
+     console.log(ingredientFilename);
+
+     const ingredients = await knex("ingredients")
+      .insert({
+        name,
+        product_id: 1,
+        image: ingredientFilename
+      })
+
+      console.log(ingredients);
     return res.json(ingredients)
   }
 }
