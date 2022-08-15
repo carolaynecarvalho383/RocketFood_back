@@ -17,24 +17,25 @@ class IngredientController {
 
   async create(req, res) {
     const { name } = req.body
-    const product_id  = req.params
+    const {product_id}  = req.query
+
     console.log(product_id);
+    
     const ingredientsFilename = req.file.filename;
     
-
-     const ingredientFilename = await diskStorage.saveFile(ingredientsFilename)
-
-     console.log(ingredientFilename);
-
-     const ingredients = await knex("ingredients")
+    
+    const ingredientFilename = await diskStorage.saveFile(ingredientsFilename)
+    
+   
+     const ingredient = await knex("ingredients")
       .insert({
         name,
-        product_id: 1,
+        product_id: product_id,
         image: ingredientFilename
       })
 
-      console.log(ingredients);
-    return res.json(ingredients)
+     console.log(ingredient);
+    return res.json({ingredient})
   }
 }
 

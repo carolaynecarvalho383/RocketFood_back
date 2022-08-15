@@ -13,7 +13,7 @@ class ProductsController {
 
     const database = await sqliteConnection()
 
-    const productFilename = req.file.filename;
+    //const productFilename = req.file.filename;
 
     const titleExists = await database.get("SELECT * FROM products WHERE title = (?)", [title])
 
@@ -25,7 +25,7 @@ class ProductsController {
       throw new AppError("Não e possível cadastrar um produto sem nome")
     }
 
-    const filename = await diskStorage.saveFile(productFilename)
+   // const filename = await diskStorage.saveFile(productFilename)
 
     const product_id = await knex("products").insert({
       title,
@@ -33,7 +33,7 @@ class ProductsController {
       description,
       inventory,
       category,
-      image:filename
+     // image:filename
     })
 
     const ingredientsInsert = ingredients.map(name => {
@@ -105,13 +105,15 @@ class ProductsController {
   }
 
   async delete(req, res) {
+
     const { id } = req.params
-    await knex("products")
-      .where({ id })
-      .delete()
 
+    console.log(id);
+    let teste =await knex("products")
+    .where({ id:id })
+    .delete()
 
-    return res.json()
+    return res.json({teste})
 
   }
 

@@ -9,7 +9,7 @@ class UsersController {
   async create(req, res) {
     
     const { name, email, password, admin} = req.body
-
+    
     const database = await sqliteConnection()
     const userExists = await database.get("SELECT * FROM users WHERE email = (?)", [email])
 

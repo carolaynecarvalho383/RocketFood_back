@@ -15,7 +15,7 @@ class UserAvatarController {
       .where({ id: user_id }).first()
 
     if (!user) {
-      throw new AppError("Somente Usuários autenticados podem alterara f foto de perfil")
+      throw new AppError("Somente Usuários autenticados podem alterara a foto de perfil")
     }
 
     if (user.avatar) {

@@ -13,19 +13,23 @@ class PurchasesController {
       .where({ id: user_id })
       .first();
 
-    const product = await knex("products")
+    const products = await knex("products")
       .select("title", "price")
       .where({ id: product_id })
       .orderBy("title")
 
-     await knex("purchases").insert({
+     const purchases = await knex("purchases").insert({
       user_id,
       product_id,
      })
 
+     purchases.forEach(name =>{
+      console.log(name);
+     })
+
     return res.json({
-      user,
-      ...product
+      ...user,
+      products
 
     });
   }
@@ -35,7 +39,7 @@ class PurchasesController {
     //const user_id = req.params
 
 
-    const purchases = await knex.raw(`	SELECT 
+    const purchases = await knex.raw(`SELECT 
     purchases.created_at ,
     users.name ,
     users.email, 
@@ -46,6 +50,8 @@ class PurchasesController {
     ON purchases.user_id = users.id
 	  INNER JOIN  products 
     ON purchases.product_id = products.id`)
+
+    
 
     return res.json({ purchases });
   }

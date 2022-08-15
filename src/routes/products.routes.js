@@ -13,7 +13,8 @@ const productsController = new ProductsController()
 
 productsRouter.post("/",admAuthenticated,upload.single("image"),productsController.create)
 productsRouter.put("/:id",admAuthenticated,upload.single("image"),productsController.update)
-productsRouter.delete("/:id",admAuthenticated,productsController.delete)
+
+productsRouter.delete("/:id",productsController.delete)
 productsRouter.get("/:id",productsController.show)
 productsRouter.get("/",productsController.index)
 
