@@ -26,7 +26,7 @@ async function AdmAuthenticated(req, response, next) {
    
     if (!isAdmin) {
       throw new AppError('Você não é um administrador', 401);
-      
+      return
     }
 
     return next()
