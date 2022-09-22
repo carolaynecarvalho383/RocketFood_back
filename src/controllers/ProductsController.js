@@ -9,14 +9,15 @@ const diskStorage = new DiskStorage()
 class ProductsController {
 
   async create(req, res) {
-    const { title, price, description, ingredients, inventory, category } = req.body
-
+    const { title, price, description, ingredients, inventory, category, } = req.body
     const database = await sqliteConnection()
 
-    //const productFilename = req.file.filename;
+    const productFilename = req.file.filename;
+
+    // const ingredientFilename = req.file.filename;
+
 
     const titleExists = await database.get("SELECT * FROM products WHERE title = (?)", [title])
-
     if (titleExists) {
       throw new AppError("produto já cadastrado")
     }
@@ -25,7 +26,9 @@ class ProductsController {
       throw new AppError("Não e possível cadastrar um produto sem nome")
     }
 
-   // const filename = await diskStorage.saveFile(productFilename)
+    const filename = await diskStorage.saveFile(productFilename)
+
+    // const filenameIngredient = await diskStorage.saveFile(ingredientFilename)
 
     const product_id = await knex("products").insert({
       title,
@@ -33,13 +36,13 @@ class ProductsController {
       description,
       inventory,
       category,
-     // image:filename
+      image: filename
     })
 
-    const ingredientsInsert = ingredients.map(name => {
+    const ingredientsInsert = JSON.parse(ingredients).map(ingredientName => {
       return {
         product_id,
-        name
+        ingredientName
       }
     })
 
@@ -52,7 +55,7 @@ class ProductsController {
     const { id } = req.params
 
     const product = await knex("products").where({ id }).first()
-    const ingredient = await knex("ingredients").where({ product_id: id }).orderBy("name")
+    const ingredient = await knex("ingredients").where({ product_id: id }).orderBy("ingredientName")
 
     return res.json({
       ...product,
@@ -65,60 +68,49 @@ class ProductsController {
     const { title, price, description, inventory } = req.body
     const { id } = req.params;
 
-    const productFilename = req.file.filename;
-
     const product = await knex("products")
-    .select("*")
-    .where({ id: id })
-    .first()
+      .select("*")
+      .where({ id })
+      .first()
 
 
     if (!product || product.length === 0) {
       throw new AppError("Produto não encontrado")
     }
-
-    if (product.image) {
-      await diskStorage.deleteFile(product.image)
-    }
-
-    const filename = await diskStorage.saveFile(productFilename)
-
+ 
 
     product.title = title ?? product.title
     product.price = price ?? product.price
     product.description = description ?? product.description
     product.inventory = inventory ?? product.inventory
-    product.image = filename  ?? product.image
 
     await knex("products")
-      .where({ id: id })
+      .where({ id })
       .update({
         title: product.title,
         price: product.price,
         description: product.description,
         inventory: product.inventory,
-        image: product.image,
         updated_at: new Date()
       })
 
-   return res.json()
+    return res.json()
   }
 
   async delete(req, res) {
 
     const { id } = req.params
 
-    console.log(id);
-    let teste =await knex("products")
-    .where({ id:id })
-    .delete()
+    let teste = await knex("products")
+      .where({ id: id })
+      .delete()
 
-    return res.json({teste})
+    return res.json({ teste })
 
   }
 
   async index(req, res) {
-    const { title, ingredients,product_id } = req.query
+    const { title, ingredients, product_id } = req.query
 
     let product
 
@@ -145,11 +137,11 @@ class ProductsController {
 
     const productIngredients = await knex("ingredients")
       .where({ product_id })
-    
+
 
     const productWithIngredient = product.map(product => {
       const ingredientsProduct = productIngredients.filter(ingredient => ingredient.product_id === product.id)
-     
+
       return {
         ...product,
         ingredients: ingredientsProduct
@@ -163,6 +155,6 @@ class ProductsController {
 
   }
 
-  
+
 }
 module.exports = ProductsController;

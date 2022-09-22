@@ -13,7 +13,7 @@ const ingredientController = new IngredientController()
 
 ingredientRouter.get("/:product_id",ingredientController.index)
 
-ingredientRouter.post("/",upload.single("image"),ingredientController.create)
+ingredientRouter.post("/",upload.single("image","ingredientImage"),ingredientController.create)
 
 
 module.exports = ingredientRouter;

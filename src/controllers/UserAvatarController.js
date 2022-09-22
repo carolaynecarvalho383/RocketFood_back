@@ -10,7 +10,6 @@ class UserAvatarController {
   async update(req, res) {
     const user_id = req.user.id;
     const avatarFilename = req.file.filename;
-    console.log(avatarFilename);
     const user = await knex("users")
       .where({ id: user_id }).first()
 
