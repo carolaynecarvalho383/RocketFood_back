@@ -8,7 +8,8 @@ const purchasesRouter = Router()
 
 const purchasesController = new PurchasesController()
 
-purchasesRouter.post("/",ensureAuthenticated,purchasesController.create)
-purchasesRouter.get("/",admAuthenticated,purchasesController.show)
+purchasesRouter.post("/:product_id",ensureAuthenticated,purchasesController.create)
+purchasesRouter.delete("/:id",ensureAuthenticated,purchasesController.delete)
+purchasesRouter.get("/",ensureAuthenticated,purchasesController.show)
 
 module.exports = purchasesRouter;

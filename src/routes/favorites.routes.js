@@ -8,8 +8,8 @@ const favoritesRouter = Router()
 
 const favoritesController = new FavoritesController()
 
-favoritesRouter.post("/", ensureAuthenticated, favoritesController.create)
-favoritesRouter.delete("/", ensureAuthenticated, favoritesController.delete)
+favoritesRouter.post("/:product_id", ensureAuthenticated, favoritesController.create)
+favoritesRouter.delete("/:product_id", ensureAuthenticated, favoritesController.delete)
 favoritesRouter.get("/",ensureAuthenticated, favoritesController.show)
 
 module.exports = favoritesRouter;
