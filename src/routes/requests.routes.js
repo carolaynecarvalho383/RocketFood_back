@@ -8,7 +8,8 @@ const requestsRoutes = Router()
 
 const requestsController = new RequestsController()
 
-requestsRoutes.post("/:purchases_id",ensureAuthenticated,requestsController.create)
+requestsRoutes.post("/",ensureAuthenticated,requestsController.create)
+requestsRoutes.get("/:id",ensureAuthenticated,requestsController.show)
 
 
 module.exports = requestsRoutes;

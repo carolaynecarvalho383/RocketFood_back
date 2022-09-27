@@ -45,7 +45,7 @@ class ProductsController {
         ingredientName
       }
     })
-
+    console.log(ingredientsInsert);
     await knex("ingredients").insert(ingredientsInsert)
 
     return res.json()

@@ -10,56 +10,69 @@ class PurchasesController {
 
     const user_id = req.user.id;
 
-    const { purchases_id } = req.params;
-
-    const allRequests = await knex('purchases_id')
-      .select('price')
+    const allRequests = await knex('purchases')
       .where({ user_id })
 
-    // const price = priceProduct.map(price => price.price)
+    const request_id = await knex("requests").insert({
+      user_id,
+      status: "Pendente",
+      totalPrice
+    })
 
-    // function calculatorTotalPrice(amount, price) {
-    //   totalPrice = Number(price.toString()) * amount
-    //   return totalPrice
-    // }
+    const requestItens = allRequests.map(purchase => {
+      return {
+        user_id,
+        request_id,
+        product_id: purchase.product_id,
+        request_amount: purchase.amount,
+        request_price: purchase.totalPrice
+      }
+    })
 
-    // calculatorTotalPrice(amount, price)
+    await knex("requests_itens").insert(requestItens)
 
-    // const purchases = await knex("purchases").insert({
-    //   user_id,
-    //   product_id,
-    //   totalPrice: totalPrice.toString(),
-    //   amount
-    // })
+    await knex('purchases')
+      .where({ user_id })
+      .delete()
 
-    return res.json(allRequests);
+    return res.json();
   }
 
   async show(req, res) {
 
-    const id = req.user.id
+    const user_id = req.user.id
+    const { id } = req.params
+    // const requests = await knex('requests')
+    //   .select([
+    //     'products.title',
+    //     'requests.*'
+    //   ]).innerJoin('products', 'products.id', 'requests.product_id')
+    //   .where('user_id', [id])
 
-
-    const purchases = await knex('purchases')
+    const requests = await knex('requests')
+      .where({ id })
+    const requestsItens = await knex('requests_itens')
       .select([
-        'products.image', 'products.title',
-        'purchases.*'
-      ]).innerJoin('products', 'products.id', 'purchases.product_id')
-      .where('user_id', [id])
+        'requests_itens.request_amount',
+        'requests_itens.request_price',
+        'products.title'
+      ]).innerJoin('products', 'products.id', 'requests_itens.product_id')
+      .where({ request_id: id })
+      .orderBy('title')
 
-
-
-
-    return res.json(purchases);
+    return res.json({
+      ...requests,
+      requestsItens
+    });
   }
 
   async delete(req, res) {
-   const {id} = req.params
-   
-   const teste = await knex('purchases')
-   .where({id})
-    .delete()
-   return res.json(teste)
+    const { id } = req.params
+
+    const teste = await knex('purchases')
+      .where({ id })
+      .delete()
+    return res.json(teste)
   }
 
 }
