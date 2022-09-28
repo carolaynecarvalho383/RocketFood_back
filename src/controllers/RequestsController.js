@@ -46,7 +46,25 @@ class PurchasesController {
     const requests = await knex('requests')
       .where('user_id', [user_id])
 
-    return res.json(requests );
+      const requestsItem = await knex("requests_itens")
+      .select([
+        "products.title",
+        "requests_itens.request_price",
+        "requests_itens.request_amount",
+        "requests_itens.request_id "
+      ])
+      .innerJoin('products', 'products.id', 'requests_itens.product_id')
+      .where('user_id', [user_id])
+
+      const allRequests = requests.map( request => {
+        const requestsItens = requestsItem.filter(item => item.request_id === request.id)
+   
+        return {
+          ...request,
+          requestsItem: requestsItens
+        }
+      })
+    return res.json(allRequests );
   }
 
   async showRequestItens(req, res){
