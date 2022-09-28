@@ -9,7 +9,8 @@ const requestsRoutes = Router()
 const requestsController = new RequestsController()
 
 requestsRoutes.post("/",ensureAuthenticated,requestsController.create)
-requestsRoutes.get("/:id",ensureAuthenticated,requestsController.show)
+requestsRoutes.get("/",ensureAuthenticated,requestsController.show)
+requestsRoutes.get("/:id",ensureAuthenticated,requestsController.showRequestItens)
 
 
 module.exports = requestsRoutes;

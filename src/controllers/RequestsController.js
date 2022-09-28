@@ -1,4 +1,4 @@
-const { json } = require("express");
+const { json, response } = require("express");
 const knex = require("../database/knex");
 
 
@@ -41,17 +41,18 @@ class PurchasesController {
   async show(req, res) {
 
     const user_id = req.user.id
-    const { id } = req.params
-    // const requests = await knex('requests')
-    //   .select([
-    //     'products.title',
-    //     'requests.*'
-    //   ]).innerJoin('products', 'products.id', 'requests.product_id')
-    //   .where('user_id', [id])
+
 
     const requests = await knex('requests')
-      .where({ id })
-    const requestsItens = await knex('requests_itens')
+      .where('user_id', [user_id])
+
+    return res.json(requests );
+  }
+
+  async showRequestItens(req, res){
+    const {id} = req.params;
+    
+     const requestsItens = await knex('requests_itens')
       .select([
         'requests_itens.request_amount',
         'requests_itens.request_price',
@@ -60,21 +61,10 @@ class PurchasesController {
       .where({ request_id: id })
       .orderBy('title')
 
-    return res.json({
-      ...requests,
-      requestsItens
-    });
+
+      return res.json(requestsItens)
   }
-
-  async delete(req, res) {
-    const { id } = req.params
-
-    const teste = await knex('purchases')
-      .where({ id })
-      .delete()
-    return res.json(teste)
-  }
-
+ 
 }
 
 module.exports = PurchasesController;
