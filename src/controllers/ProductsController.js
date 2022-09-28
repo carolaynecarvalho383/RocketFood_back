@@ -76,7 +76,7 @@ class ProductsController {
     if (!product || product.length === 0) {
       throw new AppError("Produto não encontrado")
     }
- 
+
 
     product.title = title ?? product.title
     product.price = price ?? product.price
@@ -109,51 +109,40 @@ class ProductsController {
   }
 
   async index(req, res) {
-    const { title, ingredients, product_id } = req.query
+    const { title, ingredients } = req.query
 
     let product
 
     if (ingredients) {
-      const filterIngredients = ingredients.split(',')
-        .map(ingredient => ingredient.trim());
-
+      
       product = await knex("ingredients")
         .select([
-          "products.id",
-          "products.title",
-          "products.price",
+          "products.*",
         ])
         .whereLike("products.title", `%${title}%`)
-        .whereIn("name", filterIngredients)
         .innerJoin("products", "products.id", "ingredients.product_id")
-        .orderBy("products.title")
+        .whereLike("ingredientName", `%${ingredients}%`)
+        .orderBy("products.id")
 
     } else {
       product = await knex("products")
         .whereLike("title", `%${title}%`)
-        .orderBy("title")
+        .orderBy("id")
     }
 
+    
     const productIngredients = await knex("ingredients")
-      .where({ product_id })
 
-
-    const productWithIngredient = product.map(product => {
+    const productWithIngredient = product.map( product => {
       const ingredientsProduct = productIngredients.filter(ingredient => ingredient.product_id === product.id)
-
+ 
       return {
         ...product,
         ingredients: ingredientsProduct
       }
-
     })
 
-
-
     return res.json(productWithIngredient)
-
   }
-
-
 }
 module.exports = ProductsController;
