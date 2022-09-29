@@ -15,7 +15,7 @@ class PurchasesController {
 
     const request_id = await knex("requests").insert({
       user_id,
-      status: "Pendente",
+      status:0,
       totalPrice
     })
 
@@ -42,7 +42,6 @@ class PurchasesController {
 
     const user_id = req.user.id
 
-
     const requests = await knex('requests')
       .where('user_id', [user_id])
 
@@ -67,22 +66,41 @@ class PurchasesController {
     return res.json(allRequests );
   }
 
-  async showRequestItens(req, res){
-    const {id} = req.params;
-    
-     const requestsItens = await knex('requests_itens')
-      .select([
-        'requests_itens.request_amount',
-        'requests_itens.request_price',
-        'products.title'
-      ]).innerJoin('products', 'products.id', 'requests_itens.product_id')
-      .where({ request_id: id })
-      .orderBy('title')
+  async showAdm(req, res){
+    const requests = await knex('requests')
 
+    const requestsItem = await knex("requests_itens")
+    .select([
+      "products.title",
+      "requests_itens.request_price",
+      "requests_itens.request_amount",
+      "requests_itens.request_id "
+    ])
+    .innerJoin('products', 'products.id', 'requests_itens.product_id')
 
-      return res.json(requestsItens)
-  }
+    const allRequests = requests.map( request => {
+      const requestsItens = requestsItem.filter(item => item.request_id === request.id)
  
+      return {
+        ...request,
+        requestsItem: requestsItens
+      }
+    })
+  return res.json(allRequests );
+  }
+
+
+  async update (req, res){
+    const {status} = req.body
+    const {id} = req.params
+
+   const teste = await knex("requests")
+    .where({id})
+    .update({status})
+
+
+    return res.json(teste)
+  }
 }
 
 module.exports = PurchasesController;

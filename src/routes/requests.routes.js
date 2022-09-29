@@ -10,7 +10,9 @@ const requestsController = new RequestsController()
 
 requestsRoutes.post("/",ensureAuthenticated,requestsController.create)
 requestsRoutes.get("/",ensureAuthenticated,requestsController.show)
-requestsRoutes.get("/:id",ensureAuthenticated,requestsController.showRequestItens)
+
+requestsRoutes.patch("/:id",admAuthenticated,requestsController.update)
+requestsRoutes.get("/all",admAuthenticated,requestsController.showAdm)
 
 
 module.exports = requestsRoutes;
