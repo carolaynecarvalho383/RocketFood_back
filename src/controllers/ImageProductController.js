@@ -3,31 +3,29 @@ const DiskStorage = require('../providers/DiskStorage');
 
 const diskStorage = new DiskStorage()
 
- class ImageProductController{
+class ImageProductController {
 
   async update(req, res) {
 
-    const  {id}  = req.params
+    const { id } = req.params
 
     const productFilename = req.file.filename;
-    console.log(productFilename);
-    
+
     const product = await knex("products")
-      .where({ id })
-      .first()
+      .where({ id }).first()
 
     if (product.image) {
       await diskStorage.deleteFile(product.image)
     }
     const filename = await diskStorage.saveFile(productFilename)
 
-    product.image = filename 
+    product.image = filename
 
     await knex("products")
-    .update(product)
-    .where({ id})
+      .update(product)
+      .where({ id })
 
-    return res.json()
+    return res.json(product)
   }
 
 

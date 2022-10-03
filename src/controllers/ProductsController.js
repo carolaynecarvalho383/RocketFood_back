@@ -14,9 +14,6 @@ class ProductsController {
 
     const productFilename = req.file.filename;
 
-    // const ingredientFilename = req.file.filename;
-
-
     const titleExists = await database.get("SELECT * FROM products WHERE title = (?)", [title])
     if (titleExists) {
       throw new AppError("produto já cadastrado")
@@ -28,8 +25,6 @@ class ProductsController {
 
     const filename = await diskStorage.saveFile(productFilename)
 
-    // const filenameIngredient = await diskStorage.saveFile(ingredientFilename)
-
     const product_id = await knex("products").insert({
       title,
       price,
@@ -39,7 +34,7 @@ class ProductsController {
       image: filename
     })
 
-    const ingredientsInsert = JSON.parse(ingredients).map(ingredientName => {
+    const ingredientsInsert = ingredients.map(ingredientName => {
       return {
         product_id,
         ingredientName
@@ -68,15 +63,13 @@ class ProductsController {
     const { id } = req.params;
 
     const product = await knex("products")
-      .select("*")
       .where({ id })
       .first()
-
 
     if (!product || product.length === 0) {
       throw new AppError("Produto não encontrado")
     }
-
+  
 
     product.title = title ?? product.title
     product.price = price ?? product.price
@@ -109,7 +102,7 @@ class ProductsController {
   }
 
   async index(req, res) {
-    const { title, ingredients } = req.query
+    const { title, ingredients} = req.query
 
     let product
 
