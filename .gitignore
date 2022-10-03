@@ -2,3 +2,4 @@ node_modules
 tmp
 .env
 src/database/database.db
+database.sb
