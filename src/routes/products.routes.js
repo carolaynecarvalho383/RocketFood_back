@@ -4,6 +4,7 @@ const uploadConfig = require("../config/upload");
 
 const ProductsController = require("../controllers/ProductsController")
 const ImageProductController = require("../controllers/ImageProductController")
+const ensureAuthenticated = require("../middleware/ensureAuthenticated");
 
 const admAuthenticated = require("../middleware/admAuthenticated");
 
@@ -16,13 +17,13 @@ const imageProductController = new ImageProductController()
 
 productsRouter.post("/",admAuthenticated,upload.single("image"),productsController.create)
 productsRouter.put("/:id",admAuthenticated,upload.single("image"),productsController.update)
-
-
+productsRouter.delete("/:id",admAuthenticated,productsController.delete)
 productsRouter.patch("/imageFile/:id",admAuthenticated, upload.single("image"),imageProductController.update)
 
-productsRouter.delete("/:id",productsController.delete)
-productsRouter.get("/:id",productsController.show)
-productsRouter.get("/",productsController.index)
+
+
+productsRouter.get("/:id",ensureAuthenticated,productsController.show)
+productsRouter.get("/",ensureAuthenticated,productsController.index)
 
 
 

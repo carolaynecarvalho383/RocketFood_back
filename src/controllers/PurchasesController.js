@@ -61,6 +61,15 @@ class PurchasesController {
    return res.json(teste)
   }
 
+  async update(req, res) {
+    const {id} = req.params
+    const{inventory} = req.body
+
+    await knex("products")
+    .where({ id})
+    .update({inventory})
+    return res.json()
+  }
 }
 
 module.exports = PurchasesController;

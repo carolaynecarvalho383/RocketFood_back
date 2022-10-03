@@ -34,12 +34,13 @@ class ProductsController {
       image: filename
     })
 
-    const ingredientsInsert = ingredients.map(ingredientName => {
+    const ingredientsInsert = JSON.parse(ingredients).map(ingredientName => {
       return {
         product_id,
-        ingredientName
+        ingredientName:ingredientName
       }
     })
+    
     await knex("ingredients").insert(ingredientsInsert)
 
     return res.json()

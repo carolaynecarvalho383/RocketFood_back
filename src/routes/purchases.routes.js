@@ -11,5 +11,6 @@ const purchasesController = new PurchasesController()
 purchasesRouter.post("/:product_id",ensureAuthenticated,purchasesController.create)
 purchasesRouter.delete("/:id",ensureAuthenticated,purchasesController.delete)
 purchasesRouter.get("/",ensureAuthenticated,purchasesController.show)
+purchasesRouter.patch("/inventory/:id",ensureAuthenticated,purchasesController.update)
 
 module.exports = purchasesRouter;
