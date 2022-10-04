@@ -76,6 +76,31 @@ class PurchasesController {
    .update({inventory:calcRest})
     return res.json()
   }
+
+  async showAdm(req, res){
+
+    const requests = await knex('requests')
+
+    const requestsItem = await knex("requests_itens")
+    .select([
+      "products.title",
+      "requests_itens.request_price",
+      "requests_itens.request_amount",
+      "requests_itens.request_id "
+    ])
+    .innerJoin('products', 'products.id', 'requests_itens.product_id')
+
+    const allRequests = requests.map( request => {
+      const requestsItens = requestsItem.filter(item => item.request_id === request.id)
+      console.log(requestsItens);
+
+      return {
+        ...request,
+        requestsItem: requestsItens
+      }
+    })
+  return res.json(allRequests );
+  }
 }
 
 module.exports = PurchasesController;

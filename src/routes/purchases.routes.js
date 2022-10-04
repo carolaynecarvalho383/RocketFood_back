@@ -13,4 +13,6 @@ purchasesRouter.delete("/:id",ensureAuthenticated,purchasesController.delete)
 purchasesRouter.get("/",ensureAuthenticated,purchasesController.show)
 purchasesRouter.patch("/inventory/:id",ensureAuthenticated,purchasesController.update)
 
+purchasesRouter.get("/all",admAuthenticated,purchasesController.showAdm)
+
 module.exports = purchasesRouter;

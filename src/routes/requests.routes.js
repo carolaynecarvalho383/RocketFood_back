@@ -13,7 +13,5 @@ requestsRoutes.get("/",ensureAuthenticated,requestsController.show)
 requestsRoutes.get("/:id",ensureAuthenticated,requestsController.showDetails)
 
 requestsRoutes.patch("/:id",admAuthenticated,requestsController.update)
-requestsRoutes.get("/all",admAuthenticated,requestsController.showAdm)
-
 
 module.exports = requestsRoutes;
