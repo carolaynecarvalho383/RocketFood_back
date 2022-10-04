@@ -12,7 +12,7 @@ class LoadProductController {
     
     const allProducts = await knex("products")
 
-    return res.json({ allProducts });
+    return res.json(allProducts);
   }
 
   async showCategory(req, res) {
