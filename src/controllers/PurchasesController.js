@@ -65,9 +65,15 @@ class PurchasesController {
     const {id} = req.params
     const{inventory} = req.body
 
+    const amount = await knex("products")
+    .where({ id}).first()
+    console.log(amount.inventory);
+
+    const calcRest = Number(amount.inventory - Math.round(inventory))
+
     await knex("products")
     .where({ id})
-    .update({inventory})
+   .update({inventory:calcRest})
     return res.json()
   }
 }
