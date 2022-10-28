@@ -8,7 +8,6 @@ const requestsRouter = require("./requests.routes");
 const loadProductController = require("./loadProduct.routes");
 const favoritesRouter = require("./favorites.routes");
 
-
 const routes = Router();
 
 routes.use("/users", usersRoutes);
