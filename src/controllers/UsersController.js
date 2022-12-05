@@ -12,13 +12,12 @@ class UsersController {
     
     const database = await sqliteConnection()
     const userExists = await database.get("SELECT * FROM users WHERE email = (?)", [email])
-
     if (userExists) {
       throw new AppError("Este email já esta cadastrado")
-
+      
     }
-
-    const hashedPAssword = await hash(password, 8)
+    
+    const hashedPAssword = password//await hash(password, 8)
 
     await database.run("INSERT INTO users (name, email, password , admin) VALUES (?, ?, ? ,?)",
       [name, email, hashedPAssword,admin])
