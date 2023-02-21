@@ -1,5 +1,4 @@
 const knex = require('../database/knex');
-const sqliteConnection = require("../database/sqlite")
 const AppError = require('../utils/AppError');
 
 class FavoritesController {
@@ -8,10 +7,8 @@ class FavoritesController {
     const user_id = req.user.id;
     const { product_id } = req.params;
 
-    const isFavorite = 1
-    const database = await sqliteConnection()
 
-    const favoriteExists = await database.get("SELECT * FROM favorites WHERE product_id = (?)", [product_id])
+    const favoriteExists = await knex('favorites').where({product_id: product_id})
 
     if (favoriteExists) {
       throw new AppError("Este produto já está favoritado")

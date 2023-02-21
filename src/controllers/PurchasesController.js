@@ -1,4 +1,3 @@
-const { json } = require("express");
 const knex = require("../database/knex");
 
 
@@ -55,10 +54,10 @@ class PurchasesController {
   async delete(req, res) {
    const {id} = req.params
    
-   const teste = await knex('purchases')
+    await knex('purchases')
    .where({id})
     .delete()
-   return res.json(teste)
+   return res.json()
   }
 
   async update(req, res) {
@@ -67,7 +66,6 @@ class PurchasesController {
 
     const amount = await knex("products")
     .where({ id}).first()
-    console.log(amount.inventory);
 
     const calcRest = Number(amount.inventory - Math.round(inventory))
 
@@ -92,7 +90,6 @@ class PurchasesController {
 
     const allRequests = requests.map( request => {
       const requestsItens = requestsItem.filter(item => item.request_id === request.id)
-      console.log(requestsItens);
 
       return {
         ...request,

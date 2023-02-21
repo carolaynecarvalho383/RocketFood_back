@@ -1,6 +1,5 @@
 const AppError = require('../utils/AppError');
 const knex = require("../database/knex")
-const sqliteConnection = require("../database/sqlite")
 const DiskStorage = require('../providers/DiskStorage');
 
 const diskStorage = new DiskStorage()
@@ -10,11 +9,10 @@ class ProductsController {
 
   async create(req, res) {
     const { title, price, description, ingredients, inventory, category, } = req.body
-    const database = await sqliteConnection()
 
     const productFilename = req.file.filename;
 
-    const titleExists = await database.get("SELECT * FROM products WHERE title = (?)", [title])
+    const titleExists = await knex('products').where({ title})
     if (titleExists) {
       throw new AppError("produto já cadastrado")
     }
@@ -94,11 +92,11 @@ class ProductsController {
 
     const { id } = req.params
 
-    let teste = await knex("products")
+     await knex("products")
       .where({ id: id })
       .delete()
 
-    return res.json({ teste })
+    return res.json()
 
   }
 
@@ -123,7 +121,6 @@ class ProductsController {
         .whereLike("title", `%${title}%`)
         .orderBy("id")
     }
-
     
     const productIngredients = await knex("ingredients")
 

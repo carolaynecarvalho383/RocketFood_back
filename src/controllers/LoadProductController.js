@@ -3,12 +3,9 @@ const knex = require("../database/knex");
 
 class LoadProductController {
 
- 
-
   async show(req, res) {
 
     //const user_id = req.
-  
     
     const allProducts = await knex("products")
 

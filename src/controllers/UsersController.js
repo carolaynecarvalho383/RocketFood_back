@@ -1,6 +1,5 @@
 const AppError = require('../utils/AppError');
 const knex = require("../database/knex")
-const sqliteConnection = require("../database/sqlite")
 const { hash , compare } = require('bcryptjs');
 
 
@@ -10,22 +9,18 @@ class UsersController {
     
     const { name, email, password, admin} = req.body
     
-    const database = await sqliteConnection()
-    const userExists = await database.get("SELECT * FROM users WHERE email = (?)", [email])
+     const userExists = await knex('users').where({ email },email).first()
     if (userExists) {
       throw new AppError("Este email já esta cadastrado")
-      
+
     }
-    
-    const hashedPAssword = password//await hash(password, 8)
-
-    await database.run("INSERT INTO users (name, email, password , admin) VALUES (?, ?, ? ,?)",
-      [name, email, hashedPAssword,admin])
-
+    const hashedPassword = await hash(password, 8)
 
     if (!name || name === "" || name === null) {
       throw new AppError("Nome é obrigatório")
+      return
     }
+    await knex('users').insert({name, email, password:hashedPassword , admin})
 
    return res.status(200).json({ name, email, password ,admin})
   }
@@ -36,15 +31,14 @@ class UsersController {
 
     const user_id = req.user.id
 
-    const database = await sqliteConnection()
 
-    const user = await database.get("SELECT * FROM users WHERE id = (?)", [user_id])
+    const user = await  knex('users').where({ id },user_id).first()
 
     if (!user) {
       throw new AppError("Usuário não encontrado")
     }
 
-    const userWithUpdatedEmail = await database.get("SELECT * FROM users WHERE email = (?)", [email])
+    const userWithUpdatedEmail = await  knex('users').where({ email },email).first()
     
     if (userWithUpdatedEmail && userWithUpdatedEmail.id !== user.id) {
       throw new AppError("Este email ja esta em uso")
@@ -65,18 +59,26 @@ class UsersController {
       }
       user.password = await hash(password, 8)
     }
+    const now = new Date.now()
 
-    await database.run(`
-      UPDATE users SET
-      name = ?,
-      email = ?,
-      password = ?,
-      updated_at = DATETIME('now')
-      WHERE id = ?
-    `, [user.name, user.email, user.password, user.id])
+   await knex('users')
+    .where({ id },user.id).first()
+   .update({
+    name: user.name,
+    email: user.email,
+    password: user.password,
+    updated_at: now
+   })
 
-  
+
     return res.json()
+  }
+
+  async show (req, res) {
+    const allUsers = await knex('users')
+
+
+    return res.json(allUsers);
   }
 }
 

@@ -1,4 +1,3 @@
-const { json, response } = require("express");
 const knex = require("../database/knex");
 
 
@@ -57,7 +56,6 @@ class PurchasesController {
 
       const allRequests = requests.map( request => {
         const requestsItens = requestsItem.filter(item => item.request_id === request.id)
-        console.log(requests);
 
         return {
           ...request,
@@ -81,7 +79,6 @@ class PurchasesController {
 
   async showDetails(req, res) {
 
-    const user_id = req.user.id
     const {id} = req.params
 
     const requests = await knex('requests')
